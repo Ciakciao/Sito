@@ -1,102 +1,161 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trapboy Official</title>
-  <style>
+<meta charset="UTF-8">
+<title>Artisti Emergenti</title>
+<style>
     body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-      text-align: center;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f2f2f2;
     }
-
     header {
-      padding: 40px 20px 20px;
-      background: #111;
+        background: #111;
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    #logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        background: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #aaa;
+        cursor: pointer;
+        overflow: hidden;
+        border: 2px solid #555;
+    }
+    #logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
-    .avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #ff2f56;
+    #formArtist, #artistsList {
+        margin: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
     }
 
-    h1 {
-      font-size: 2.5em;
-      margin: 15px 0 5px;
+    .artistCard {
+        background: #e8e8e8;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
     }
 
-    p.bio {
-      font-size: 1.1em;
-      color: #ccc;
+    .artistCard img {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
     }
-
-    nav {
-      margin: 30px 0;
-    }
-
-    nav a {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 24px;
-      background: #ff2f56;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: 0.2s;
-    }
-
-    nav a:hover {
-      background: #e81c45;
-    }
-
-    section {
-      padding: 30px 20px;
-    }
-
-    .footer {
-      font-size: 0.9em;
-      color: #777;
-      padding: 30px;
-    }
-  </style>
+</style>
 </head>
 <body>
 
-  <header>
-    <img src="foto-profilo.jpg" alt="Trapboy" class="avatar" />
-    <h1>Trapboy</h1>
-    <p class="bio">Alessio, artista trap italiano. Nato a Isernia l'08/02/2002.</p>
-  </header>
+<header>
+    <div id="logo">Clicca<br>qui</div>
+    <h1>Artisti Emergenti</h1>
+</header>
 
-  <nav>
-    <a href="https://www.instagram.com/fuckyoutrapboy/" target="_blank">Instagram</a>
-    <a href="https://open.spotify.com/artist/0QHF2Mpkhi5zEbgmEkNd8G?si=ZLQoi4YQQLmt2pwLb84MRA" target="_blank">Spotify</a>
-    <a href="https://youtube.com/@trapboyofficial2002?si=b20SUwdN_GDMa1CF" target="_blank">YouTube</a>
-    <a href="https://www.tiktok.com/@tuonome" target="_blank">TikTok</a>
-  </nav>
+<input type="file" id="uploadLogo" accept="image/*" style="display:none">
+<input type="file" id="artistPhoto" accept="image/*" style="display:none">
 
-  <section>
-    <h2>Chi sono</h2>
-    <p>
-      Mi chiamo Alessio, in arte Trapboy. Sono nato a Isernia l'8 febbraio 2002 e fin da piccolo ho avuto una grande passione per la musica.
-      Crescendo, ho deciso di seguire il mio sogno: fare musica trap e raccontare la mia realtà con sincerità e stile. Oggi porto avanti il mio progetto musicale con determinazione e autenticità.
-    </p>
-  </section>
+<div id="formArtist">
+    <h2>Aggiungi un artista emergente</h2>
 
-  <section>
-    <h2>Ultimi Video / Brani</h2>
-    <p>Aggiungi qui i tuoi ultimi video o embed da YouTube/Spotify.</p>
-  </section>
+    <input type="text" id="artistName" placeholder="Nome artista" style="width:100%; padding:10px;">
+    <br><br>
 
-  <div class="footer">
-    &copy; 2025 Trapboy (Alessio). Tutti i diritti riservati.
-  </div>
+    <textarea id="artistDesc" placeholder="Descrizione breve" style="width:100%; padding:10px; height:80px;"></textarea>
+    <br><br>
+
+    <button onclick="document.getElementById('artistPhoto').click()">
+        Carica foto artista
+    </button>
+
+    <span id="photoStatus" style="margin-left:10px; color:green;"></span>
+
+    <br><br>
+
+    <button onclick="addArtist()" style="padding:10px 20px;">Aggiungi Artista</button>
+</div>
+
+<div id="artistsList">
+    <h2>Artisti aggiunti</h2>
+</div>
+
+<script>
+// --- LOGO ---
+document.getElementById("logo").onclick = () => {
+    document.getElementById("uploadLogo").click();
+};
+
+document.getElementById("uploadLogo").onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+
+    const logoDiv = document.getElementById("logo");
+    logoDiv.innerHTML = "";
+    logoDiv.appendChild(img);
+};
+
+// --- FOTO ARTISTA ---
+let artistPhotoFile = null;
+
+document.getElementById("artistPhoto").onchange = function(e) {
+    artistPhotoFile = e.target.files[0];
+    document.getElementById("photoStatus").innerText = "Foto caricata ✔️";
+};
+
+// --- AGGIUNTA ARTISTA ---
+function addArtist() {
+    const name = document.getElementById("artistName").value.trim();
+    const desc = document.getElementById("artistDesc").value.trim();
+
+    if (!name) {
+        alert("Inserisci il nome dell'artista!");
+        return;
+    }
+    if (!artistPhotoFile) {
+        alert("Carica una foto dell'artista!");
+        return;
+    }
+
+    const imgURL = URL.createObjectURL(artistPhotoFile);
+
+    const card = document.createElement("div");
+    card.className = "artistCard";
+    card.innerHTML = `
+        <img src="${imgURL}" alt="Foto Artista">
+        <div>
+            <strong>${name}</strong><br>
+            ${desc}
+        </div>
+    `;
+
+    document.getElementById("artistsList").appendChild(card);
+
+    // reset campi
+    document.getElementById("artistName").value = "";
+    document.getElementById("artistDesc").value = "";
+    artistPhotoFile = null;
+    document.getElementById("photoStatus").innerText = "";
+}
+</script>
 
 </body>
 </html>
